@@ -1,7 +1,6 @@
 import time
 import pandas as pd
 import yfinance as yf
-import ta
 import requests
 from datetime import datetime
 
