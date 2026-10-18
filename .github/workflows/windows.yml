@@ -1,0 +1,47 @@
+name: Windows 10 RDP via Tailscale
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Activer la virtualisation KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+
+      - name: Connecter le runner GitHub à Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+          args: --accept-routes
+
+      - name: Lancer Windows 10 via Docker
+        run: |
+          docker run -d --name windows10 \
+            --device=/dev/kvm \
+            --cap-add=NET_ADMIN \
+            -e VERSION="10" \
+            -p 3389:3389/tcp \
+            -p 3389:3389/udp \
+            dockurr/windows
+
+      - name: Vérifier l'état du conteneur Windows 10
+        run: docker ps -a
+
+      - name: Récupérer l'IP Tailscale du runner
+        run: |
+          echo "=== ADRESSE IP TAILSCALE DU RUNNER ==="
+          tailscale ip -4
+          echo "Utilisez cette IP dans le Bureau à distance : [IP_TAILSCALE]:3389"
+
+      - name: Garder la session active
+        run: |
+          sleep 21600
+          
