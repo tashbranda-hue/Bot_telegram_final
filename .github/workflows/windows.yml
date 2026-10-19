@@ -41,7 +41,9 @@ jobs:
           tailscale ip -4
           echo "Utilisez cette IP dans le Bureau à distance : [IP_TAILSCALE]:3389"
 
+      - name: Afficher les logs du conteneur Windows
+        run: docker logs windows10
+
       - name: Garder la session active
         run: |
           sleep 21600
-          
