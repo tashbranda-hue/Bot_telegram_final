@@ -22,9 +22,6 @@ jobs:
           authkey: ${{ secrets.TS_AUTHKEY }}
           args: --accept-routes
 
-      - name: Télécharger l'image Windows Docker
-        run: docker pull dockur/windows:latest
-
       - name: Lancer Windows 10 via Docker
         run: |
           docker run -d --name windows10 \
@@ -34,20 +31,7 @@ jobs:
             -e RAM="8G" \
             -p 3389:3389/tcp \
             -p 3389:3389/udp \
-            dockur/windows:latest
-
-      - name: Attendre que Windows 10 démarre
-        run: |
-          echo "Patientez pendant le premier démarrage de Windows..."
-          sleep 90
-
-      - name: Installer Ollama et Qwen 2.5 Coder dans Windows
-        run: |
-          echo "Téléchargement et installation d'Ollama..."
-          docker exec windows10 cmd /c "powershell -Command \"Invoke-WebRequest -Uri 'https://ollama.com/download/OllamaSetup.exe' -OutFile 'OllamaSetup.exe'; Start-Process -FilePath 'OllamaSetup.exe' -ArgumentList '/VERYSILENT', '/NORESTART' -Wait; Remove-Item 'OllamaSetup.exe'\""
-          
-          echo "Lancement du service Ollama et téléchargement du modèle..."
-          docker exec windows10 cmd /c "powershell -Command \"Start-Process 'C:\Users\ContainerUser\AppData\Local\Programs\Ollama\ollama.exe' -ArgumentList 'serve'; Start-Sleep -Seconds 5; & 'C:\Users\ContainerUser\AppData\Local\Programs\Ollama\ollama.exe' pull qwen2.5-coder:1.5b\""
+            dockurr/windows
 
       - name: Vérifier l'état du conteneur Windows 10
         run: docker ps -a
@@ -57,7 +41,6 @@ jobs:
           echo "=== ADRESSE IP TAILSCALE DU RUNNER ==="
           tailscale ip -4
           echo "Utilisez cette IP dans le Bureau à distance : [IP_TAILSCALE]:3389"
-          echo "Ollama est disponible sur http://localhost:11434 à l'intérieur de Windows."
 
       - name: Afficher les logs du conteneur Windows
         run: docker logs windows10
