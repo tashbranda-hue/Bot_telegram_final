@@ -28,6 +28,7 @@ jobs:
             --device=/dev/kvm \
             --cap-add=NET_ADMIN \
             -e VERSION="10" \
+            -e RAM="8G" \
             -p 3389:3389/tcp \
             -p 3389:3389/udp \
             dockurr/windows
