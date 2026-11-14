@@ -7,7 +7,7 @@ on:
 jobs:
   run-relay:
     runs-on: ubuntu-latest
-    timeout-minutes: 360 # Maintient l'action active pendant 6 heures maximum
+    timeout-minutes: 360
     
     steps:
     - name: Checkout Repository
@@ -18,12 +18,11 @@ jobs:
         echo "Téléchargement et installation de Xray-core..."
         sudo apt-get update && sudo apt-get install -y curl unzip
         
-        # Télécharger la dernière version de Xray
-        CU=$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases/latest | grep "browser_download_url.*linux-64.zip" | cut -d '"' -f 4)
-        curl -L -o xray.zip "$CU"
+        # Téléchargement direct de Xray-core (version stable Linux 64-bit)
+        curl -L -o xray.zip "https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip"
         unzip xray.zip -d xray-bin
         
-        # Lancer Xray en arrière-plan avec votre fichier config.json
+        # Lancement de Xray en arrière-plan avec votre fichier config.json
         echo "Lancement du relais VMess local sur le port 8080..."
         ./xray-bin/xray run -c ./config.json &
 
@@ -44,5 +43,5 @@ jobs:
         echo "C'est cette URL que vous mettrez dans le champ HOST !"
         echo "===================================================="
         
-        # Maintenir le workflow en vie pendant 6 heures (21600 secondes)
+        # Maintien du workflow en vie pendant 6 heures
         sleep 21590
